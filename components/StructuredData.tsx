@@ -15,7 +15,7 @@ export function StructuredData() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+91-9895767256',
+      telephone: '+91-8848271413',
       contactType: 'customer service',
       availableLanguage: ['English', 'Hindi', 'Malayalam'],
     },

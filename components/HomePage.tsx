@@ -170,7 +170,7 @@ export default function HomePage() {
           {/* CTAs */}
           <div className="mt-10 flex flex-wrap items-center gap-4 sm:mt-[86px] sm:gap-[26px]">
             <a
-              href={`https://wa.me/919895767256?text=${encodeURIComponent("Hi NeXlab! I'd like to know more about your courses.")}`}
+              href={`https://wa.me/918848271413?text=${encodeURIComponent("Hi NeXlab! I'd like to know more about your courses.")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="box-border inline-flex h-[54px] cursor-pointer items-center justify-center gap-[10px] rounded-[10px] border border-[#000000] bg-[#7462FE] px-6 py-4 text-[14px] font-black leading-[100%] tracking-[0.02em] text-[#FFFFFF] no-underline shadow-[7px_5px_0_#000000] transition duration-150 hover:translate-y-1 hover:shadow-[5px_3px_0_#000000] active:translate-y-[2px] active:shadow-[3px_2px_0_#000000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3e2dd5] focus-visible:ring-offset-2 sm:h-[65px] sm:px-[30px] sm:py-[20px] sm:text-[16px] sm:shadow-[10px_7px_0_#000000]"
@@ -338,7 +338,7 @@ export default function HomePage() {
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-lg font-extrabold text-brand-pink">{c.price}</span>
                   <a
-                    href={`https://wa.me/919895767256?text=${encodeURIComponent(`Hi NeXlab! I'm interested to join this course: "${c.title}". Please reply me ASAP.`)}`}
+                    href={`https://wa.me/918848271413?text=${encodeURIComponent(`Hi NeXlab! I'm interested to join this course: "${c.title}". Please reply me ASAP.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex h-10 items-center justify-center rounded-[8px] border-2 border-foreground bg-brand-purple px-4 text-sm font-extrabold text-white shadow-[4px_4px_0_hsl(var(--foreground))] transition-transform hover:-translate-y-0.5"
@@ -410,7 +410,7 @@ export default function HomePage() {
               Register Now
             </button>
             <a
-              href={`https://wa.me/919895767256?text=${encodeURIComponent("Hi NeXlab! I'd like to know more about your courses.")}`}
+              href={`https://wa.me/918848271413?text=${encodeURIComponent("Hi NeXlab! I'd like to know more about your courses.")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-[60px] items-center justify-center rounded-[10px] border-2 border-foreground bg-white px-8 text-base font-black text-foreground shadow-[8px_8px_0_hsl(var(--foreground))] transition-transform hover:-translate-y-1"
