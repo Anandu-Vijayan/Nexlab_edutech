@@ -51,18 +51,34 @@ const features = [
 ];
 
 const baseCourses = [
-  { title: 'VR Science Lab', level: 'Grades 6–10', duration: '8 weeks', price: '₹4,999', color: 'bg-brand-purple' },
-  { title: 'AR Math Adventures', level: 'Grades 4–8', duration: '6 weeks', price: '₹3,499', color: 'bg-brand-pink' },
-  { title: 'Game Design 101', level: 'Ages 12+', duration: '10 weeks', price: '₹6,999', color: 'bg-brand-lime' },
-  { title: 'Animation & VFX', level: 'Ages 14+', duration: '12 weeks', price: '₹8,499', color: 'bg-brand-orange' },
-  { title: 'AI for Teens', level: 'Ages 13+', duration: '8 weeks', price: '₹5,999', color: 'bg-brand-red' },
-  { title: 'Robotics Studio', level: 'Grades 7–12', duration: '10 weeks', price: '₹7,499', color: 'bg-brand-purple' },
+  {
+    title: 'Nexseed course (Prekg to +2) (foundation)',
+    level: 'Prekg to +2',
+    duration: 'Foundation track',
+    price: 'Contact for fee',
+    color: 'bg-brand-purple',
+  },
+  {
+    title: 'Nexup course (Prekg to +2) (academics)',
+    level: 'Prekg to +2',
+    duration: 'Academic track',
+    price: 'Contact for fee',
+    color: 'bg-brand-pink',
+  },
+  { title: 'Vedic maths 5 to 10 (Non-NeXseed students)', level: 'Grades 5 to 10', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-lime' },
+  { title: 'Speak lab course', level: 'All levels', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-orange' },
+  { title: 'Vacation courses', level: 'All levels', duration: 'Seasonal batch', price: 'Contact for fee', color: 'bg-brand-red' },
+  { title: 'Madrasa classes', level: 'All levels', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-purple' },
 ];
 
 const additionalCourses = [
-  { title: 'Coding with Python', level: 'Ages 11+', duration: '8 weeks', price: '₹5,499', color: 'bg-brand-lime' },
-  { title: '3D Modeling Studio', level: 'Ages 13+', duration: '10 weeks', price: '₹6,499', color: 'bg-brand-pink' },
-  { title: 'Drone & IoT Lab', level: 'Grades 8–12', duration: '12 weeks', price: '₹8,999', color: 'bg-brand-orange' },
+  {
+    title: 'Arabic reading and writing',
+    level: 'All levels',
+    duration: 'Regular batch',
+    price: 'Contact for fee',
+    color: 'bg-brand-lime',
+  },
 ];
 
 const testimonials = [

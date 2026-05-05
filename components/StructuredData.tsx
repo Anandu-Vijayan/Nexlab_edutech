@@ -31,16 +31,11 @@ export function StructuredData() {
         position: 1,
         item: {
           '@type': 'Course',
-          name: 'VR Science Lab',
-          description: 'Step inside science with VR experiences designed for grades 6-10',
+          name: 'Nexseed course (Prekg to +2) (foundation)',
+          description: 'Foundation course from Prekg to +2',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
-          },
-          offers: {
-            '@type': 'Offer',
-            price: '4999',
-            priceCurrency: 'INR',
           },
         },
       },
@@ -49,16 +44,11 @@ export function StructuredData() {
         position: 2,
         item: {
           '@type': 'Course',
-          name: 'AR Math Adventures',
-          description: 'Learn math through augmented reality for grades 4-8',
+          name: 'Nexup course (Prekg to +2) (academics)',
+          description: 'Academic course from Prekg to +2',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
-          },
-          offers: {
-            '@type': 'Offer',
-            price: '3499',
-            priceCurrency: 'INR',
           },
         },
       },
@@ -67,16 +57,11 @@ export function StructuredData() {
         position: 3,
         item: {
           '@type': 'Course',
-          name: 'Game Design 101',
-          description: 'Learn game design fundamentals for ages 12+',
+          name: 'Vedic maths 5 to 10',
+          description: 'Vedic maths course for grades 5 to 10',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
-          },
-          offers: {
-            '@type': 'Offer',
-            price: '6999',
-            priceCurrency: 'INR',
           },
         },
       },
@@ -85,16 +70,11 @@ export function StructuredData() {
         position: 4,
         item: {
           '@type': 'Course',
-          name: 'Animation & VFX',
-          description: 'Learn animation and visual effects for ages 14+',
+          name: 'Speak lab course',
+          description: 'Language and communication development course',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
-          },
-          offers: {
-            '@type': 'Offer',
-            price: '8499',
-            priceCurrency: 'INR',
           },
         },
       },
@@ -103,16 +83,11 @@ export function StructuredData() {
         position: 5,
         item: {
           '@type': 'Course',
-          name: 'AI for Teens',
-          description: 'Introduction to artificial intelligence for ages 13+',
+          name: 'Vacation courses',
+          description: 'Short-term courses during vacation periods',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
-          },
-          offers: {
-            '@type': 'Offer',
-            price: '5999',
-            priceCurrency: 'INR',
           },
         },
       },
@@ -121,16 +96,24 @@ export function StructuredData() {
         position: 6,
         item: {
           '@type': 'Course',
-          name: 'Robotics Studio',
-          description: 'Hands-on robotics learning for grades 7-12',
+          name: 'Madrasa classes',
+          description: 'Structured madrasa learning classes',
           provider: {
             '@type': 'EducationalOrganization',
             name: 'NeXlab Edu Hub',
           },
-          offers: {
-            '@type': 'Offer',
-            price: '7499',
-            priceCurrency: 'INR',
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 7,
+        item: {
+          '@type': 'Course',
+          name: 'Arabic reading and writing',
+          description: 'Arabic reading and writing classes for learners',
+          provider: {
+            '@type': 'EducationalOrganization',
+            name: 'NeXlab Edu Hub',
           },
         },
       },
