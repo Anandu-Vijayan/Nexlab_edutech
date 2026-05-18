@@ -6,9 +6,9 @@ import RegisterModal from '@/components/RegisterModal';
 
 const navItems = [
   { label: 'Home', href: '#' },
-  { label: 'Careers', href: '#' },
-  { label: 'Blog', href: '#' },
-  { label: 'About Us', href: '#' },
+  { label: 'Courses', href: '#courses' },
+  { label: 'Blog', href: '#testimonials' },
+  { label: 'About Us', href: '#vision' },
 ];
 
 const features = [
@@ -253,7 +253,7 @@ export default function HomePage() {
       </section>
 
       {/* Our Vision */}
-      <section className="px-4 pb-16 sm:pb-20 lg:px-10">
+      <section id="vision" className="scroll-mt-24 px-4 pb-16 sm:pb-20 lg:px-10">
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-brand-red px-5 py-14 sm:rounded-[40px] sm:px-6 sm:py-20 lg:px-16 lg:py-28">
           {/* Decorative purple star top-right */}
           <svg aria-hidden viewBox="0 0 100 100" className="absolute -right-6 -top-6 h-32 w-32 lg:h-44 lg:w-44">
@@ -369,7 +369,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="mx-auto max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-14">
+      <section id="testimonials" className="mx-auto max-w-[1400px] scroll-mt-24 px-4 pb-16 sm:px-6 sm:pb-20 lg:px-14">
         <div className="flex flex-col items-center text-center">
           <span className="inline-block rounded-full border-2 border-foreground bg-brand-pink px-6 py-2 text-sm font-bold text-white shadow-[4px_4px_0_hsl(var(--foreground))]">
             Loved by Learners
@@ -463,17 +463,12 @@ export default function HomePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-brand-lime">
+                  <a href="#vision" className="hover:text-brand-lime">
                     About Us
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-brand-lime">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-brand-lime">
+                  <a href="#testimonials" className="hover:text-brand-lime">
                     Blog
                   </a>
                 </li>
