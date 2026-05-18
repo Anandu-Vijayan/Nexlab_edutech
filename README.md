@@ -66,7 +66,10 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 │   └── StructuredData.tsx  # JSON-LD structured data
 ├── lib/                    # Utility functions
 │   ├── utils.ts            # Tailwind merge utility
-│   └── submitRegistrationToSheet.ts  # Google Sheets API
+│   ├── rateLimit.ts        # In-memory API rate limiting
+│   ├── registrationSchema.ts  # Shared Zod validation
+│   └── submitRegistrationToSheet.ts  # Registration API client
+├── app/api/register/       # Registration API (rate limit, validation)
 ├── hooks/                  # Custom React hooks
 ├── public/                 # Static assets
 │   └── images/             # Image assets
@@ -85,11 +88,26 @@ This project can save registration data to Google Sheets via Google Apps Script.
 2. Go to Extensions > Apps Script
 3. Copy the contents of `scripts/google-apps-script-append-row.gs`
 4. Deploy as a Web App (Execute as: Me, Who has access: Anyone)
-5. Copy the deployment URL to your `.env` file:
+5. Copy the deployment URL to your `.env` file (server-only — do not use `NEXT_PUBLIC_`):
 
 ```
-NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+GOOGLE_SHEETS_WEB_APP_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 ```
+
+6. (Recommended) Set `REGISTRATION_API_SECRET` in both `.env` and Apps Script **Script properties** so only your server can append rows.
+
+### Registration API security
+
+`POST /api/register` is protected with:
+
+- In-memory rate limiting (default: 5 requests / 15 minutes per IP)
+- Server-side Zod validation
+- Honeypot and minimum fill-time checks
+- 8KB body size limit
+
+`GET /api/register` returns `{ configured: boolean }` without exposing the Sheets URL.
+
+**Note:** In-memory rate limits reset on restart and do not sync across multiple serverless instances. For high-traffic production on Vercel, consider [Upstash Redis](https://upstash.com/) later.
 
 ## SEO Features
 

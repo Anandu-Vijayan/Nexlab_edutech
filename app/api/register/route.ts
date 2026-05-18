@@ -1,7 +1,23 @@
 import { NextResponse } from "next/server";
+import {
+  getClientIp,
+  getRegisterRateLimitConfig,
+  rateLimit,
+} from "@/lib/rateLimit";
+import { parseRegistrationSubmit, toSheetPayload } from "@/lib/registrationSchema";
+
+const MAX_BODY_BYTES = 8 * 1024;
+
+function isSheetConfigured(): boolean {
+  return Boolean(process.env.GOOGLE_SHEETS_WEB_APP_URL?.trim());
+}
+
+export async function GET() {
+  return NextResponse.json({ configured: isSheetConfigured() });
+}
 
 export async function POST(request: Request) {
-  const webAppUrl = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL?.trim();
+  const webAppUrl = process.env.GOOGLE_SHEETS_WEB_APP_URL?.trim();
 
   if (!webAppUrl) {
     return NextResponse.json(
@@ -10,23 +26,94 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const data = await request.json();
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && Number(contentLength) > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { ok: false, error: "Request body too large" },
+      { status: 413 }
+    );
+  }
 
+  const ip = getClientIp(request);
+  const limitConfig = getRegisterRateLimitConfig();
+  const limitResult = rateLimit(ip, "register", limitConfig);
+
+  if (limitResult.allowed === false) {
+    const retryAfterSeconds = limitResult.retryAfterSeconds;
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Too many registration attempts. Please try again later.",
+        retryAfterSeconds,
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(retryAfterSeconds),
+        },
+      }
+    );
+  }
+
+  let rawBody: string;
+  try {
+    rawBody = await request.text();
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+
+  if (rawBody.length > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { ok: false, error: "Request body too large" },
+      { status: 413 }
+    );
+  }
+
+  let parsedJson: unknown;
+  try {
+    parsedJson = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Invalid JSON" },
+      { status: 400 }
+    );
+  }
+
+  const validation = parseRegistrationSubmit(parsedJson);
+  if (!validation.success) {
+    const honeypotFilled = validation.error.issues.some((i) => i.path[0] === "website");
+    if (honeypotFilled) {
+      return NextResponse.json({ ok: true });
+    }
+    const firstMessage = validation.error.issues[0]?.message ?? "Invalid registration data";
+    return NextResponse.json(
+      { ok: false, error: firstMessage },
+      { status: 400 }
+    );
+  }
+
+  const sheetPayload = toSheetPayload(validation.data);
+  const apiSecret = process.env.REGISTRATION_API_SECRET?.trim();
+
+  try {
     const response = await fetch(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...data,
+        ...sheetPayload,
         submittedAtIso: new Date().toISOString(),
+        ...(apiSecret ? { secret: apiSecret } : {}),
       }),
     });
 
     const result = await response.text();
-    
-    let parsed;
+
+    let parsed: { ok?: boolean; error?: string };
     try {
-      parsed = JSON.parse(result);
+      parsed = JSON.parse(result) as { ok?: boolean; error?: string };
     } catch {
       parsed = { ok: true };
     }

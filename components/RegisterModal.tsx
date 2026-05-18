@@ -1,22 +1,10 @@
 'use client';
 
-import { useState } from "react";
-import { z } from "zod";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { isGoogleSheetConfigured, submitRegistrationToSheet } from "@/lib/submitRegistrationToSheet";
-
-const registerSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[+\d][\d\s-]{6,18}$/, "Enter a valid phone number"),
-  email: z.string().trim().email("Invalid email").max(255, "Email too long"),
-  address: z.string().trim().min(5, "Address is too short").max(300, "Address too long"),
-  studentClass: z.string().min(1, "Please select a class"),
-  school: z.string().trim().max(150, "School name too long").optional().or(z.literal("")),
-});
+import { registrationFieldsSchema } from "@/lib/registrationSchema";
+import { isRegistrationConfigured, submitRegistrationToSheet } from "@/lib/submitRegistrationToSheet";
 
 type RegisterModalProps = {
   open: boolean;
@@ -29,10 +17,15 @@ const classOptions = [
   "Grade 11", "Grade 12",
 ];
 
+const SUBMIT_COOLDOWN_MS = 30_000;
+
 const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [submitCooldown, setSubmitCooldown] = useState(false);
+  const [configured, setConfigured] = useState<boolean | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const formOpenedAtRef = useRef<number>(Date.now());
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -40,7 +33,26 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
     address: "",
     studentClass: "",
     school: "",
+    website: "",
   });
+
+  useEffect(() => {
+    if (open) {
+      formOpenedAtRef.current = Date.now();
+      setForm((p) => ({ ...p, website: "" }));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    isRegistrationConfigured().then((value) => {
+      if (!cancelled) setConfigured(value);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((p) => ({ ...p, [field]: value }));
@@ -49,7 +61,7 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = registerSchema.safeParse(form);
+    const result = registrationFieldsSchema.safeParse(form);
     if (!result.success) {
       const next: Record<string, string> = {};
       result.error.issues.forEach((i) => {
@@ -60,28 +72,51 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
     }
     setSubmitting(true);
     try {
-      if (isGoogleSheetConfigured()) {
-        await submitRegistrationToSheet({
+      if (configured === true) {
+        const submitResult = await submitRegistrationToSheet({
           name: result.data.name,
           phone: result.data.phone,
           email: result.data.email,
           address: result.data.address,
           studentClass: result.data.studentClass,
           school: result.data.school || "",
+          website: form.website,
+          formOpenedAt: formOpenedAtRef.current,
         });
+
+        if (!submitResult.ok) {
+          if (submitResult.retryAfterSeconds) {
+            const minutes = Math.max(1, Math.ceil(submitResult.retryAfterSeconds / 60));
+            toast({
+              variant: "destructive",
+              title: "Too many attempts",
+              description: `Please try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`,
+            });
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Could not submit",
+              description: submitResult.error || "Something went wrong. Please try again.",
+            });
+          }
+          return;
+        }
       } else {
         console.warn(
-          "[RegisterModal] NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL is not set. Data is only acknowledged locally."
+          "[RegisterModal] GOOGLE_SHEETS_WEB_APP_URL is not set on the server. Data is only acknowledged locally."
         );
         await new Promise((r) => setTimeout(r, 400));
       }
+
       toast({
         title: "Registration received! 🎉",
-        description: isGoogleSheetConfigured()
+        description: configured
           ? "We'll reach out to you shortly."
-          : "Saved locally for demo. Add NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL to send rows to Google Sheets.",
+          : "Saved locally for demo. Set GOOGLE_SHEETS_WEB_APP_URL in .env to send rows to Google Sheets.",
       });
-      setForm({ name: "", phone: "", email: "", address: "", studentClass: "", school: "" });
+      setForm({ name: "", phone: "", email: "", address: "", studentClass: "", school: "", website: "" });
+      setSubmitCooldown(true);
+      window.setTimeout(() => setSubmitCooldown(false), SUBMIT_COOLDOWN_MS);
       onOpenChange(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong. Please try again.";
@@ -101,7 +136,6 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[95vh] w-[calc(100vw-1.5rem)] max-w-[560px] overflow-x-hidden overflow-y-auto rounded-[20px] border-2 border-foreground bg-background p-0 shadow-[6px_6px_0_hsl(var(--foreground))] sm:rounded-[24px] sm:shadow-[12px_12px_0_hsl(var(--foreground))]">
-        {/* Header strip */}
         <div className="relative overflow-hidden rounded-t-[18px] bg-brand-purple px-5 py-6 sm:rounded-t-[22px] sm:px-8 sm:py-7">
           <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-brand-lime opacity-80" />
           <div className="absolute -bottom-6 -left-6 h-16 w-16 rounded-full bg-brand-pink opacity-90" />
@@ -119,6 +153,17 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 px-5 pb-7 pr-6 pt-6 sm:px-8 sm:pb-8 sm:pt-6">
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            value={form.website}
+            onChange={(e) => handleChange("website", e.target.value)}
+            className="absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+          />
+
           <div>
             <label htmlFor="name" className="mb-1.5 block text-sm font-bold text-foreground">
               Full Name
@@ -136,7 +181,7 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
+                <div>
               <label htmlFor="phone" className="mb-1.5 block text-sm font-bold text-foreground">
                 Phone Number
               </label>
@@ -229,10 +274,10 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || submitCooldown}
               className="inline-flex h-12 items-center justify-center rounded-[10px] border-2 border-foreground bg-brand-pink px-6 text-sm font-black text-white shadow-[6px_6px_0_hsl(var(--foreground))] transition-transform hover:-translate-y-0.5 disabled:opacity-70"
             >
-              {submitting ? "Submitting..." : "Register Now"}
+              {submitting ? "Submitting..." : submitCooldown ? "Please wait..." : "Register Now"}
             </button>
           </div>
         </form>
