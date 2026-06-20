@@ -503,26 +503,32 @@ export default function HomePage() {
             <div>
               <h4 className="text-sm font-extrabold uppercase tracking-wide text-background">Contact</h4>
               <ul className="mt-4 space-y-2 text-sm text-background/70">
-                <li>hello@nexlab.in</li>
+                <li>nexlabeduhub@gmail.com</li>
                 <li>Kerala, India</li>
                 <li className="flex gap-3 pt-2">
                   <a
-                    href="#"
+                    href="https://www.instagram.com/nexlab_eduhub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                     aria-label="Instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-background/30 hover:bg-brand-pink hover:text-white"
                   >
                     IG
                   </a>
                   <a
-                    href="#"
+                    href="https://www.linkedin.com/company/nexlabedu/posts/?feedView=all"
                     aria-label="LinkedIn"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-background/30 hover:bg-brand-purple hover:text-white"
                   >
                     in
                   </a>
                   <a
-                    href="#"
+                    href="https://youtube.com/@nexlabeduhub?si=sgUIAFzoE_xiva4z"
                     aria-label="YouTube"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-background/30 hover:bg-brand-red hover:text-white"
                   >
                     YT
@@ -535,10 +541,10 @@ export default function HomePage() {
             <p>© {new Date().getFullYear()} NeXlab Edu Hub. All rights reserved.</p>
             <div className="flex gap-5">
               <a href="#" className="hover:text-background">
-                Privacy
+                {/* Privacy */}
               </a>
               <a href="#" className="hover:text-background">
-                Terms
+                {/* Terms */}
               </a>
             </div>
           </div>
