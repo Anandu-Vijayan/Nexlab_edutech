@@ -505,6 +505,7 @@ export default function HomePage() {
               <ul className="mt-4 space-y-2 text-sm text-background/70">
                 <li>nexlabeduhub@gmail.com</li>
                 <li>Kerala, India</li>
+                <li>+91 8848271413</li>
                 <li className="flex gap-3 pt-2">
                   <a
                     href="https://www.instagram.com/nexlab_eduhub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
