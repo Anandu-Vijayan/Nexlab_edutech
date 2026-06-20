@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import {
+  formatRetryAfter,
   getClientIp,
+  getRateLimitStatus,
   getRegisterRateLimitConfig,
   rateLimit,
 } from "@/lib/rateLimit";
@@ -12,8 +14,27 @@ function isSheetConfigured(): boolean {
   return Boolean(process.env.GOOGLE_SHEETS_WEB_APP_URL?.trim());
 }
 
-export async function GET() {
-  return NextResponse.json({ configured: isSheetConfigured() });
+function buildRateLimitPayload(ip: string) {
+  const limitConfig = getRegisterRateLimitConfig();
+  const status = getRateLimitStatus(ip, "register", limitConfig);
+  const windowHours = Math.round(limitConfig.windowMs / 3_600_000);
+
+  return {
+    max: status.max,
+    remaining: status.remaining,
+    used: status.used,
+    blocked: !status.allowed,
+    retryAfterSeconds: status.retryAfterSeconds,
+    windowHours,
+  };
+}
+
+export async function GET(request: Request) {
+  const ip = getClientIp(request);
+  return NextResponse.json({
+    configured: isSheetConfigured(),
+    rateLimit: buildRateLimitPayload(ip),
+  });
 }
 
 export async function POST(request: Request) {
@@ -40,11 +61,19 @@ export async function POST(request: Request) {
 
   if (limitResult.allowed === false) {
     const retryAfterSeconds = limitResult.retryAfterSeconds;
+    const retryLabel = formatRetryAfter(retryAfterSeconds);
     return NextResponse.json(
       {
         ok: false,
-        error: "Too many registration attempts. Please try again later.",
+        error: `Registration limit reached. Only ${limitResult.max} submissions are allowed per 24 hours from your network. Try again in ${retryLabel}.`,
         retryAfterSeconds,
+        rateLimit: {
+          max: limitResult.max,
+          remaining: 0,
+          used: limitResult.used,
+          blocked: true,
+          retryAfterSeconds,
+        },
       },
       {
         status: 429,
@@ -125,7 +154,10 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      rateLimit: buildRateLimitPayload(ip),
+    });
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

@@ -5,21 +5,44 @@ export type RegistrationPayload = RegistrationFields & {
   formOpenedAt?: number;
 };
 
+export type RegistrationRateLimitInfo = {
+  max: number;
+  remaining: number;
+  used: number;
+  blocked: boolean;
+  retryAfterSeconds?: number;
+  windowHours: number;
+};
+
+export type RegistrationStatus = {
+  configured: boolean;
+  rateLimit?: RegistrationRateLimitInfo;
+};
+
 export type SubmitRegistrationResult = {
   ok: boolean;
   error?: string;
   retryAfterSeconds?: number;
+  rateLimit?: RegistrationRateLimitInfo;
 };
 
-export async function isRegistrationConfigured(): Promise<boolean> {
+export async function getRegistrationStatus(): Promise<RegistrationStatus> {
   try {
     const res = await fetch("/api/register", { method: "GET" });
-    if (!res.ok) return false;
-    const body = (await res.json()) as { configured?: boolean };
-    return body.configured === true;
+    if (!res.ok) return { configured: false };
+    const body = (await res.json()) as RegistrationStatus;
+    return {
+      configured: body.configured === true,
+      rateLimit: body.rateLimit,
+    };
   } catch {
-    return false;
+    return { configured: false };
   }
+}
+
+export async function isRegistrationConfigured(): Promise<boolean> {
+  const status = await getRegistrationStatus();
+  return status.configured;
 }
 
 /**
@@ -35,7 +58,12 @@ export async function submitRegistrationToSheet(
     body: JSON.stringify(data),
   });
 
-  let body: { ok?: boolean; error?: string; retryAfterSeconds?: number } | null = null;
+  let body: {
+    ok?: boolean;
+    error?: string;
+    retryAfterSeconds?: number;
+    rateLimit?: SubmitRegistrationResult["rateLimit"];
+  } | null = null;
   try {
     body = await res.json();
   } catch {
@@ -47,6 +75,7 @@ export async function submitRegistrationToSheet(
       ok: false,
       error: body?.error || "Too many registration attempts. Please try again later.",
       retryAfterSeconds: body?.retryAfterSeconds,
+      rateLimit: body?.rateLimit,
     };
   }
 
@@ -57,5 +86,8 @@ export async function submitRegistrationToSheet(
     };
   }
 
-  return { ok: true };
+  return {
+    ok: true,
+    rateLimit: body?.rateLimit,
+  };
 }

@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { registrationFieldsSchema } from "@/lib/registrationSchema";
-import { isRegistrationConfigured, submitRegistrationToSheet } from "@/lib/submitRegistrationToSheet";
+import { formatRetryAfter } from "@/lib/rateLimit";
+import {
+  getRegistrationStatus,
+  type RegistrationRateLimitInfo,
+  submitRegistrationToSheet,
+} from "@/lib/submitRegistrationToSheet";
 
 type RegisterModalProps = {
   open: boolean;
@@ -27,13 +32,23 @@ const courseOptions = [
   "Arabic reading and writing",
 ];
 
-const SUBMIT_COOLDOWN_MS = 30_000;
+function showRateLimitToast(
+  toast: ReturnType<typeof useToast>["toast"],
+  retryAfterSeconds?: number
+) {
+  const retryLabel = retryAfterSeconds ? formatRetryAfter(retryAfterSeconds) : "later";
+  toast({
+    variant: "destructive",
+    title: "Registration limit reached",
+    description: `Please try again in ${retryLabel}.`,
+  });
+}
 
 const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const [submitCooldown, setSubmitCooldown] = useState(false);
   const [configured, setConfigured] = useState<boolean | null>(null);
+  const [rateLimit, setRateLimit] = useState<RegistrationRateLimitInfo | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const formOpenedAtRef = useRef<number>(Date.now());
   const [form, setForm] = useState({
@@ -57,8 +72,10 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    isRegistrationConfigured().then((value) => {
-      if (!cancelled) setConfigured(value);
+    getRegistrationStatus().then((status) => {
+      if (cancelled) return;
+      setConfigured(status.configured);
+      setRateLimit(status.rateLimit ?? null);
     });
     return () => {
       cancelled = true;
@@ -73,6 +90,10 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (rateLimit?.blocked) {
+      showRateLimitToast(toast, rateLimit.retryAfterSeconds);
+      return;
+    }
     const result = registrationFieldsSchema.safeParse(form);
     if (!result.success) {
       const next: Record<string, string> = {};
@@ -99,12 +120,14 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
 
         if (!submitResult.ok) {
           if (submitResult.retryAfterSeconds) {
-            const minutes = Math.max(1, Math.ceil(submitResult.retryAfterSeconds / 60));
-            toast({
-              variant: "destructive",
-              title: "Too many attempts",
-              description: `Please try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`,
-            });
+            if (submitResult.rateLimit) {
+              setRateLimit({
+                ...submitResult.rateLimit,
+                retryAfterSeconds: submitResult.retryAfterSeconds,
+                windowHours: submitResult.rateLimit.windowHours ?? 24,
+              });
+            }
+            showRateLimitToast(toast, submitResult.retryAfterSeconds);
           } else {
             toast({
               variant: "destructive",
@@ -113,6 +136,16 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
             });
           }
           return;
+        }
+
+        if (submitResult.rateLimit) {
+          setRateLimit(submitResult.rateLimit);
+        } else {
+          setRateLimit((prev) =>
+            prev
+              ? { ...prev, remaining: Math.max(0, prev.remaining - 1), used: prev.used + 1 }
+              : prev
+          );
         }
       } else {
         console.warn(
@@ -128,8 +161,6 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
           : "Saved locally for demo. Set GOOGLE_SHEETS_WEB_APP_URL in .env to send rows to Google Sheets.",
       });
       setForm({ name: "", phone: "", email: "", address: "", studentClass: "", course: "", school: "", website: "" });
-      setSubmitCooldown(true);
-      window.setTimeout(() => setSubmitCooldown(false), SUBMIT_COOLDOWN_MS);
       onOpenChange(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong. Please try again.";
@@ -308,10 +339,10 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
             </button>
             <button
               type="submit"
-              disabled={submitting || submitCooldown}
+              disabled={submitting}
               className="inline-flex h-12 items-center justify-center rounded-[10px] border-2 border-foreground bg-brand-pink px-6 text-sm font-black text-white shadow-[6px_6px_0_hsl(var(--foreground))] transition-transform hover:-translate-y-0.5 disabled:opacity-70"
             >
-              {submitting ? "Submitting..." : submitCooldown ? "Please wait..." : "Register Now"}
+              {submitting ? "Submitting..." : "Register Now"}
             </button>
           </div>
         </form>
