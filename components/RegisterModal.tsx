@@ -17,6 +17,16 @@ const classOptions = [
   "Grade 11", "Grade 12",
 ];
 
+const courseOptions = [
+  "Nexseed course (Prekg to +2) (foundation)",
+  "Nexup course (Prekg to +2) (academics)",
+  "Vedic maths 5 to 10 (Non-NeXseed students)",
+  "Speak lab course",
+  "Vacation courses",
+  "Madrasa classes",
+  "Arabic reading and writing",
+];
+
 const SUBMIT_COOLDOWN_MS = 30_000;
 
 const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
@@ -32,6 +42,7 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
     email: "",
     address: "",
     studentClass: "",
+    course: "",
     school: "",
     website: "",
   });
@@ -55,7 +66,8 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
   }, [open]);
 
   const handleChange = (field: keyof typeof form, value: string) => {
-    setForm((p) => ({ ...p, [field]: value }));
+    const nextValue = field === "phone" ? value.replace(/\D/g, "") : value;
+    setForm((p) => ({ ...p, [field]: nextValue }));
     if (errors[field]) setErrors((p) => ({ ...p, [field]: "" }));
   };
 
@@ -79,6 +91,7 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
           email: result.data.email,
           address: result.data.address,
           studentClass: result.data.studentClass,
+          course: result.data.course,
           school: result.data.school || "",
           website: form.website,
           formOpenedAt: formOpenedAtRef.current,
@@ -114,7 +127,7 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
           ? "We'll reach out to you shortly."
           : "Saved locally for demo. Set GOOGLE_SHEETS_WEB_APP_URL in .env to send rows to Google Sheets.",
       });
-      setForm({ name: "", phone: "", email: "", address: "", studentClass: "", school: "", website: "" });
+      setForm({ name: "", phone: "", email: "", address: "", studentClass: "", course: "", school: "", website: "" });
       setSubmitCooldown(true);
       window.setTimeout(() => setSubmitCooldown(false), SUBMIT_COOLDOWN_MS);
       onOpenChange(false);
@@ -188,11 +201,14 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
               <input
                 id="phone"
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
-                maxLength={20}
-                placeholder="+91 98765 43210"
+                maxLength={15}
+                placeholder="9876543210"
                 className={inputBase}
+                aria-invalid={Boolean(errors.phone)}
               />
               {errors.phone && <p className="mt-1 text-xs font-semibold text-brand-red">{errors.phone}</p>}
             </div>
@@ -227,6 +243,24 @@ const RegisterModal = ({ open, onOpenChange }: RegisterModalProps) => {
               className={`${inputBase} resize-none`}
             />
             {errors.address && <p className="mt-1 text-xs font-semibold text-brand-red">{errors.address}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="course" className="mb-1.5 block text-sm font-bold text-foreground">
+              Course
+            </label>
+            <select
+              id="course"
+              value={form.course}
+              onChange={(e) => handleChange("course", e.target.value)}
+              className={inputBase}
+            >
+              <option value="">Select course</option>
+              {courseOptions.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            {errors.course && <p className="mt-1 text-xs font-semibold text-brand-red">{errors.course}</p>}
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -14,7 +14,7 @@
  * 6. After any code change: Deploy → Manage deployments → Edit (pencil) → Version "New version" → Deploy.
  */
 
-var HEADERS = ["Timestamp", "Name", "Phone", "Email", "Address", "Class", "School", "Submitted At (ISO)"];
+var HEADERS = ["Timestamp", "Name", "Phone", "Email", "Address", "Class", "Course", "School", "Submitted At (ISO)"];
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -50,6 +50,7 @@ function doPost(e) {
       String(data.email || ""),
       String(data.address || ""),
       String(data.studentClass || ""),
+      String(data.course || ""),
       String(data.school || ""),
       String(data.submittedAtIso || ""),
     ]);

@@ -2355,9 +2355,6 @@ video {
 .underline-offset-4 {
   text-underline-offset: 4px;
 }
-.underline-offset-2 {
-  text-underline-offset: 2px;
-}
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -3704,6 +3701,10 @@ html {
     top: auto;
   }
 
+  .sm\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
   .sm\:mt-0 {
     margin-top: 0px;
   }
@@ -3888,6 +3889,10 @@ html {
 
   .sm\:text-left {
     text-align: left;
+  }
+
+  .sm\:text-right {
+    text-align: right;
   }
 
   .sm\:text-3xl {
