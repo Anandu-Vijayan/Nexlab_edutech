@@ -70,20 +70,20 @@ const baseCourses = [
     title: 'Nexseed course (Prekg to +2) (foundation)',
     level: 'Prekg to +2',
     duration: 'Foundation track',
-    price: 'Contact for fee',
+    price: 'Contact For Free',
     color: 'bg-brand-purple',
   },
   {
     title: 'Nexup course (Prekg to +2) (academics)',
     level: 'Prekg to +2',
     duration: 'Academic track',
-    price: 'Contact for fee',
+    price: 'Contact For Free',
     color: 'bg-brand-pink',
   },
-  { title: 'Vedic maths 5 to 10 (Non-NeXseed students)', level: 'Grades 5 to 10', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-lime' },
-  { title: 'Speak lab course', level: 'All levels', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-orange' },
-  { title: 'Vacation courses', level: 'All levels', duration: 'Seasonal batch', price: 'Contact for fee', color: 'bg-brand-red' },
-  { title: 'Madrasa classes', level: 'All levels', duration: 'Regular batch', price: 'Contact for fee', color: 'bg-brand-purple' },
+  { title: 'Vedic maths 5 to 10 (Non-NeXseed students)', level: 'Grades 5 to 10', duration: 'Regular batch', price: 'Contact For Free', color: 'bg-brand-lime' },
+  { title: 'Speak lab course', level: 'All levels', duration: 'Regular batch', price: 'Contact For Free', color: 'bg-brand-orange' },
+  { title: 'Vacation courses', level: 'All levels', duration: 'Seasonal batch', price: 'Contact For Free', color: 'bg-brand-red' },
+  { title: 'Madrasa classes', level: 'All levels', duration: 'Regular batch', price: 'Contact For Free', color: 'bg-brand-purple' },
 ];
 
 const additionalCourses = [
@@ -91,7 +91,7 @@ const additionalCourses = [
     title: 'Arabic reading and writing',
     level: 'All levels',
     duration: 'Regular batch',
-    price: 'Contact for fee',
+    price: 'Contact For Free',
     color: 'bg-brand-lime',
   },
 ];
