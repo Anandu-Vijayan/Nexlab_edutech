@@ -1,4 +1,4 @@
-// File: C:\Users\Faircode\Desktop\Personal\NexLab Eduhub 1\Nexlab\app\api\register\route.ts
+// File: E:\Nexlab_edutech\app\api\register\route.ts
 import * as entry from '../../../../../app/api/register/route.js'
 import type { NextRequest } from 'next/server.js'
 

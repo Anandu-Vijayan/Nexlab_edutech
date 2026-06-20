@@ -1,8 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import RegisterModal from '@/components/RegisterModal';
+
+const CONTACT_PHONE_TEL = 'tel:+918848271413';
+const WHATSAPP_NUMBER = '918848271413';
+
+function isPhoneDevice() {
+  return /Android|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function getFeeContactHref(courseTitle: string, usePhoneCall: boolean) {
+  if (usePhoneCall) return CONTACT_PHONE_TEL;
+
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hi NeXlab! I'd like to know the fee for "${courseTitle}".`
+  )}`;
+}
 
 const navItems = [
   { label: 'Home', href: '#' },
@@ -105,6 +120,11 @@ const testimonials = [
 export default function HomePage() {
   const [registerOpen, setRegisterOpen] = useState(false);
   const [showAllCourses, setShowAllCourses] = useState(false);
+  const [usePhoneCall, setUsePhoneCall] = useState(false);
+
+  useEffect(() => {
+    setUsePhoneCall(isPhoneDevice());
+  }, []);
 
   const courses = showAllCourses ? [...baseCourses, ...additionalCourses] : baseCourses;
 
@@ -352,7 +372,13 @@ export default function HomePage() {
                 </div>
                 <h3 className="mt-2 text-xl font-extrabold text-foreground">{c.title}</h3>
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-extrabold text-brand-pink">{c.price}</span>
+                  <a
+                    href={getFeeContactHref(c.title, usePhoneCall)}
+                    {...(!usePhoneCall && { target: '_blank', rel: 'noopener noreferrer' })}
+                    className="text-lg font-extrabold text-brand-pink transition-opacity hover:opacity-80"
+                  >
+                    {c.price}
+                  </a>
                   <a
                     href={`https://wa.me/918848271413?text=${encodeURIComponent(`Hi NeXlab! I'm interested to join this course: "${c.title}". Please reply me ASAP.`)}`}
                     target="_blank"

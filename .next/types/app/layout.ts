@@ -1,4 +1,4 @@
-// File: C:\Users\Faircode\Desktop\Personal\NexLab Eduhub 1\Nexlab\app\layout.tsx
+// File: E:\Nexlab_edutech\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
