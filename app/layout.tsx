@@ -104,9 +104,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
+        <Analytics />
+        {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
       </body>
-      {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
-      <Analytics />
     </html>
   );
 }
