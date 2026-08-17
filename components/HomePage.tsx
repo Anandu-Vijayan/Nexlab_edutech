@@ -60,7 +60,7 @@ const features = [
   {
     title: 'Career Pathways',
     desc: 'Mentorship, internships and certifications that lead to real opportunities.',
-    bg: 'bg-brand-purple',
+    bg: 'bg-brand-purple' ,
     icon: '🚀',
   },
 ];
