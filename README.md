@@ -109,6 +109,23 @@ GOOGLE_SHEETS_WEB_APP_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/
 
 **Note:** In-memory rate limits reset on restart and do not sync across multiple serverless instances. For high-traffic production on Vercel, consider [Upstash Redis](https://upstash.com/) later.
 
+## Google Analytics
+
+GA4 is wired in via the official [`@next/third-parties`](https://nextjs.org/docs/app/guides/third-party-libraries#google-analytics) package's `<GoogleAnalytics />` component, rendered in `app/layout.tsx`. It only injects the tracking script when `NEXT_PUBLIC_GA_ID` is set (must use the `NEXT_PUBLIC_` prefix since it runs client-side).
+
+### Setup
+
+1. Create a GA4 property at [analytics.google.com](https://analytics.google.com) and copy its Measurement ID (format `G-XXXXXXXXXX`) from **Admin > Data Streams > (your stream)**.
+2. Add it to `.env.local`:
+
+```
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+3. In Vercel: **Project > Settings > Environment Variables**, add `NEXT_PUBLIC_GA_ID` with the same value, scoped to Production (and Preview if you want preview deploys tracked separately).
+4. Redeploy — env var changes don't apply to already-running deployments.
+5. Verify with GA's Realtime report.
+
 ## SEO Features
 
 - Server-side rendering for better SEO

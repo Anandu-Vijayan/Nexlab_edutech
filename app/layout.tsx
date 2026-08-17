@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Poppins } from 'next/font/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/components/Providers';
 import { StructuredData } from '@/components/StructuredData';
 import '@/app/globals.css';
+
+const GA_MEASUREMENT_ID: string | undefined = process.env.NEXT_PUBLIC_GA_ID;
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -101,6 +104,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
+      {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
     </html>
   );
 }
