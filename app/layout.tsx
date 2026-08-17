@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Poppins } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/next';
 import { Providers } from '@/components/Providers';
 import { StructuredData } from '@/components/StructuredData';
 import '@/app/globals.css';
@@ -103,6 +104,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
       {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
     </html>
